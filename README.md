@@ -16,6 +16,21 @@ This installs the pre-commit hook into `.git/hooks/pre-commit` and copies patter
 
 On each `git commit`, the hook runs `git diff --cached` and checks added lines against regex patterns. If any match, the commit is blocked.
 
+## Exceptions
+
+To allow a specific secret, add a `//allow-leaky` comment on the same line or the line immediately after the secret:
+
+```javascript
+const apiKey = "sk-1234567890abcdef"; //allow-leaky
+```
+
+or
+
+```javascript
+const apiKey = "sk-1234567890abcdef";
+//allow-leaky
+```
+
 ## Default patterns
 
 | Pattern          | Example                     |
