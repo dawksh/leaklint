@@ -1,0 +1,9 @@
+{
+  "AWS Access Key": "AKIA[0-9A-Z]{16}",
+  "AWS Secret Key": "(?i)aws(.{0,20})?(secret|private)?(.{0,20})?[\"'=:\\s]{1,6}[0-9a-zA-Z/+]{40}",
+  "OpenAI API Key": "sk-[a-zA-Z0-9]{48}",
+  "Stripe API Key": "sk_live_[0-9a-zA-Z]{24}",
+  "GitHub Token": "ghp_[0-9a-zA-Z]{36}",
+  "Private Key": "-----BEGIN (RSA|EC|DSA|OPENSSH) PRIVATE KEY-----",
+  "JWT": "eyJ[A-Za-z0-9_-]+\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+"
+}
