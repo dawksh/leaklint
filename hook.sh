@@ -2,7 +2,7 @@
 set -e
 
 ROOT_DIR=$(git rev-parse --show-toplevel)
-PATTERNS_FILE="$ROOT_DIR/.secret-guard-patterns.json"
+PATTERNS_FILE="$ROOT_DIR/.leaklint-patterns.json"
 
 if [ ! -f "$PATTERNS_FILE" ]; then
   echo "❌ Secret patterns file not found: $PATTERNS_FILE"
@@ -18,7 +18,10 @@ while IFS= read -r line; do
   REGEX=$(echo "$line" | jq -r '.[keys[]]')
 done < <(jq -c 'to_entries[] | {(.key): .value}' "$PATTERNS_FILE")
 
-mapfile -t diff_lines <<<"$STAGED_DIFF"
+diff_lines=()
+while IFS= read -r line; do
+  diff_lines+=( "$line" )
+done <<< "$STAGED_DIFF"
 
 current_file=""
 current_line=0
