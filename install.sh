@@ -1,13 +1,27 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
+
+REPO="dawksh/leaklint"
+VERSION="latest"
+
+echo "🔍 Installing leaklint $VERSION..."
+
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "❌ Not inside a git repository"
+  exit 1
+fi
 
 HOOK_DIR=".git/hooks"
-HOOK_FILE="$HOOK_DIR/pre-commit"
+mkdir -p "$HOOK_DIR"
 
-cp hook.sh "$HOOK_FILE"
-chmod +x "$HOOK_FILE"
+curl -fsSL \
+  "https://github.com/$REPO/releases/download/$VERSION/hook.sh" \
+  -o "$HOOK_DIR/pre-commit"
 
-cp patterns.json ".secret-guard-patterns.json"
+chmod +x "$HOOK_DIR/pre-commit"
 
-echo "✅ Secret Guard installed!"
-echo "🔒 Commits will now be scanned for secrets"
+curl -fsSL \
+  "https://github.com/$REPO/releases/download/$VERSION/patterns.json" \
+  -o ".leaklint-patterns.json"
+
+echo "✅ leaklint installed"
