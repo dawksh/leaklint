@@ -20,8 +20,22 @@ done < <(jq -c 'to_entries[] | {(.key): .value}' "$PATTERNS_FILE")
 
 mapfile -t diff_lines <<<"$STAGED_DIFF"
 
+current_file=""
+current_line=0
+
 for i in "${!diff_lines[@]}"; do
   diff_line="${diff_lines[$i]}"
+  
+  if [[ "$diff_line" =~ ^\+\+\+\ b/(.+) ]]; then
+    current_file="${BASH_REMATCH[1]}"
+    continue
+  fi
+  
+  if [[ "$diff_line" =~ ^@@\ -[0-9]+(,[0-9]+)?\ \+([0-9]+)(,[0-9]+)?\ @@ ]]; then
+    current_line="${BASH_REMATCH[2]}"
+    continue
+  fi
+  
   [[ "$diff_line" =~ ^\+[^+] ]] || continue
 
   for key in $(jq -r 'keys[]' "$PATTERNS_FILE"); do
@@ -35,10 +49,16 @@ for i in "${!diff_lines[@]}"; do
       fi
       
       echo "🚨 SECRET DETECTED: $key"
-      echo "→ $diff_line"
+      echo "   File: $current_file"
+      echo "   Line: $current_line"
+      echo "   → $diff_line"
       FOUND=1
     fi
   done
+  
+  if [[ "$diff_line" =~ ^\+ ]]; then
+    ((current_line++))
+  fi
 done
 
 if [ "$FOUND" -eq 1 ]; then
