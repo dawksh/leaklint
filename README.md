@@ -7,7 +7,7 @@ Pre-commit hook that scans staged changes for secrets and blocks commits when ma
 Copy `hook.sh`, `install.sh`, and `patterns.json` into your repo, then run:
 
 ```bash
-./install.sh
+curl -fsSL https://github.com/dawksh/leaklint/releases/latest/download/install.sh | bash
 ```
 
 This installs the pre-commit hook into `.git/hooks/pre-commit` and copies patterns to `.secret-guard-patterns.json`.
