@@ -18,19 +18,28 @@ while IFS= read -r line; do
   REGEX=$(echo "$line" | jq -r '.[keys[]]')
 done < <(jq -c 'to_entries[] | {(.key): .value}' "$PATTERNS_FILE")
 
-while read -r diff_line; do
+mapfile -t diff_lines <<<"$STAGED_DIFF"
+
+for i in "${!diff_lines[@]}"; do
+  diff_line="${diff_lines[$i]}"
   [[ "$diff_line" =~ ^\+[^+] ]] || continue
 
   for key in $(jq -r 'keys[]' "$PATTERNS_FILE"); do
     regex=$(jq -r --arg k "$key" '.[$k]' "$PATTERNS_FILE")
 
     if echo "$diff_line" | grep -Eqi "$regex"; then
+      next_line="${diff_lines[$((i+1))]}"
+      
+      if echo "$diff_line" | grep -qi "//allow-leaky" || echo "$next_line" | grep -qi "//allow-leaky"; then
+        continue
+      fi
+      
       echo "🚨 SECRET DETECTED: $key"
       echo "→ $diff_line"
       FOUND=1
     fi
   done
-done <<<"$STAGED_DIFF"
+done
 
 if [ "$FOUND" -eq 1 ]; then
   echo ""
